@@ -75,17 +75,21 @@ task :deploy => :environment do
     # instance of your project.
     invoke :'git:clone'
     invoke :'deploy:link_shared_paths'
-    #queue %[cd #{deploy_to!} && sudo >Gemfile.lock && sudo rm -r #{deploy_to!}/vendor/bundle/]
     invoke :'bundle:install'
     invoke :'rails:db_migrate'
     invoke :'rails:assets_precompile'
     invoke :'deploy:cleanup'
 
-    #to :launch do
-    #  queue "mkdir -p #{deploy_to}/#{current_path}/tmp/"
-    #  queue "touch #{deploy_to}/#{current_path}/tmp/restart.txt"
-    #end
+    to :launch do
+      queue 'sudo /etc/init.d/nginx restart'
+      #queue "mkdir -p #{deploy_to}/#{current_path}/tmp/"
+      #queue "touch #{deploy_to}/#{current_path}/tmp/restart.txt"
+    end
   end
+end
+
+task :restart do
+  queue 'sudo /etc/init.d/nginx restart'
 end
 
 # For help in making your deploy script, see the Mina documentation:
